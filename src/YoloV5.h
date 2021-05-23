@@ -71,7 +71,7 @@ public:
 	YoloV5(std::string ptFile, bool isCuda = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
 	/**
 	 * 预测函数
-	 * @param data 语言预测的数据格式 (batch, 三原色, height, 宽)
+	 * @param data 语言预测的数据格式 (batch, rgb, height, width)
 	 */
 	std::vector<torch::Tensor> prediction(torch::Tensor data);
 	/**
