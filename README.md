@@ -19,7 +19,8 @@
 4. 对结果处理
     + 画框
         ```
-        cv::Mat img = yolo.drawRectangle("图片", r[0]);
+        // img 为预测前的图片 
+        cv::Mat img = yolo.drawRectangle(img, r[0]);
         ```
     + 判断是否存在类型
         ```
