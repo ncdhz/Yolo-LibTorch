@@ -1,4 +1,4 @@
-#include "YoloV5.h"
+#include <YoloV5.h>
 
 YoloV5::YoloV5(std::string ptFile, bool isCuda, int height, int width, float confThres, float iouThres)
 {
