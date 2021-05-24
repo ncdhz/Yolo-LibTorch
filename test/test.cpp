@@ -4,7 +4,7 @@
 
 int main()
 {
-	YoloV5 yolo("./yolov5s.torchscript.pt", true);
+	YoloV5 yolo("./yolov5s.torchscript.pt", false);
 	std::ifstream f("./coco.txt");
 	std::string name = "";
 	int i = 0;
