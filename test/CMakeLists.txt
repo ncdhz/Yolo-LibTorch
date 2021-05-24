@@ -1,4 +1,4 @@
-install(FILES ./coco.txt ./yolov5s.torchscript.pt DESTINATION ${CMAKE_SOURCE_DIR}/bin)
+install(FILES ./coco.txt ./yolov5s.cpu.pt ./yolov5s.cuda.pt DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 
 find_package(OpenCV REQUIRED)
 find_package(Torch REQUIRED)

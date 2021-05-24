@@ -4,7 +4,8 @@
 
 int main()
 {
-	YoloV5 yolo("./yolov5s.torchscript.pt", false);
+	YoloV5 yolo(torch::cuda::is_available() ? "./yolov5s.cuda.pt" : "./yolov5s.cpu.pt", torch::cuda::is_available());
+	yolo.prediction(torch::rand({1, 3, 640, 640}));
 	std::ifstream f("./coco.txt");
 	std::string name = "";
 	int i = 0;
@@ -15,8 +16,8 @@ int main()
 		i++;
 	}
 	cv::VideoCapture cap = cv::VideoCapture(0);
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 1000);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 800);
 	cv::Mat frame;
 	while (cap.isOpened())
 	{
