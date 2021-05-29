@@ -1,3 +1,6 @@
+### 此项目使用可参考教程
+[VS2019 配置 LibTorch 和 OpenCV](https://zhuanlan.zhihu.com/p/375084412)
+[Windows 下 C++ 中使用 YoloV5](https://zhuanlan.zhihu.com/p/376149679)
 ### Windows 10 中编译此项目
 1. 下载所需要的编译工具
     
