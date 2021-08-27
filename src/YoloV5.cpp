@@ -163,6 +163,14 @@ std::vector<torch::Tensor> YoloV5::sizeOriginal(std::vector<torch::Tensor> resul
 				tensor[0] *= (float)imgRD.getW() / (float)(imgRD.getWidth() - 2 * imgRD.getBorder());
 				tensor[2] *= (float)imgRD.getW() / (float)(imgRD.getWidth() - 2 * imgRD.getBorder());
 			}
+			// 加了黑边之后预测结果可能在黑边上，就会造成结果为负数
+			for (int k = 0;k < 4; k++)
+			{
+				if (tensor[k].item().toFloat() < 0)
+				{
+					tensor[k] = 0;
+				}
+			}
 		}
 		
 		resultOrg.push_back(data);
