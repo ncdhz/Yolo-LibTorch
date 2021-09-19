@@ -338,13 +338,17 @@ cv::Mat YoloV5::drawRectangle(cv::Mat img, torch::Tensor rectangle, std::map<int
 		}
 		cv::rectangle(img, cv::Point(rectangle[i][0].item().toInt(), rectangle[i][1].item().toInt()), cv::Point(rectangle[i][2].item().toInt(), rectangle[i][3].item().toInt()), color, thickness);
 		labelIt = labels.find(clazz);
+
 		std::ostringstream oss;
-		oss << rectangle[i][4].item().toFloat();
-		std::string label = oss.str();
+		
 		if (labelIt != labels.end())
 		{
-			label = labelIt->second.append(" ").append(label);
+			oss << labelIt->second << " ";
 		}
+
+		oss << rectangle[i][4].item().toFloat();
+		std::string label = oss.str();
+
 		cv::putText(img, label, cv::Point(rectangle[i][0].item().toInt(), rectangle[i][1].item().toInt()), cv::FONT_HERSHEY_PLAIN, 1, color, thickness);
 	}
 	return img;
