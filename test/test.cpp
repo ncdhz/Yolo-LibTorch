@@ -1,7 +1,7 @@
 #include <YoloV5.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
-
+#include <time.h>
 #include "YoloV5.h"
 
 int main()
@@ -39,7 +39,10 @@ int main()
 		}
 		// 预测
 		// 简单吧，两行代码预测结果就出来了，封装的还可以吧 嘚瑟
+		clock_t start = clock();
 		std::vector<torch::Tensor> r = yolo.prediction(frame);
+		clock_t ends = clock();
+		std::cout <<"Running Time : "<<(double)(ends - start) / CLOCKS_PER_SEC << std::endl;
 		// 画框根据你自己的项目调用相应的方法，也可以不画框自己处理
 		frame = yolo.drawRectangle(frame, r[0], labels);
 		// show 图片
