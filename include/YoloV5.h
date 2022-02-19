@@ -68,7 +68,7 @@ public:
 	 * @param confThres 非极大值抑制中的 scoreThresh
 	 * @param iouThres 非极大值抑制中的 iouThresh
      */
-	YoloV5(std::string ptFile, bool isCuda = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
+	YoloV5(std::string ptFile, bool isCuda = false, bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
 	/**
 	 * 预测函数
 	 * @param data 语言预测的数据格式 (batch, rgb, height, width)
@@ -186,6 +186,8 @@ public:
 private:
 	// 是否启用 cuda
 	bool isCuda;
+	// 是否使用半精度
+	bool isHalf;
 	// 非极大值抑制中的第一步数据清理
 	float confThres;
 	// 非极大值抑制中 iou

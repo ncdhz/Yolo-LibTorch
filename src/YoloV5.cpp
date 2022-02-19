@@ -1,16 +1,22 @@
 #include "YoloV5.h"
 
-YoloV5::YoloV5(std::string ptFile, bool isCuda, int height, int width, float confThres, float iouThres)
+YoloV5::YoloV5(std::string ptFile, bool isCuda, bool isHalf, int height, int width, float confThres, float iouThres)
 {
 	model = torch::jit::load(ptFile);
-	if (isCuda) {
+	if (isCuda) 
+	{
 		model.to(torch::kCUDA);
+	}
+	if (isHalf) 
+	{
+		model.to(torch::kHalf);
 	}
 	this->height = height;
 	this->width = width;
 	this->isCuda = isCuda;
 	this->iouThres = iouThres;
 	this->confThres = confThres;
+	this->isHalf = isHalf;
 	model.eval();
 	unsigned seed = time(0);
 	std::srand(seed);
@@ -104,13 +110,16 @@ torch::Tensor YoloV5::nms(torch::Tensor bboxes, torch::Tensor scores, float thre
 	auto order = std::get<1>(tuple_sorted);
 
 	std::vector<int> keep;
-	while (order.numel() > 0) {
-		if (order.numel() == 1) {
+	while (order.numel() > 0) 
+	{
+		if (order.numel() == 1) 
+		{
 			auto i = order.item();
 			keep.push_back(i.toInt());
 			break;
 		}
-		else {
+		else 
+		{
 			auto i = order[0].item();
 			keep.push_back(i.toInt());
 		}
@@ -125,7 +134,8 @@ torch::Tensor YoloV5::nms(torch::Tensor bboxes, torch::Tensor scores, float thre
 
 		auto iou = inter / (areas[keep.back()] + areas.index({ order.narrow(0,1,order.size(-1) - 1) }) - inter);
 		auto idx = (iou <= thresh).nonzero().squeeze();
-		if (idx.numel() == 0) {
+		if (idx.numel() == 0) 
+		{
 			break;
 		}
 		order = order.index({ idx + 1 });
@@ -187,6 +197,10 @@ std::vector<torch::Tensor> YoloV5::prediction(torch::Tensor data)
 	if (data.is_cuda() && !this->isCuda) 
 	{
 		data = data.cpu();
+	}
+	if (this->isHalf)
+	{
+		data = data.to(torch::kHalf);
 	}
 	torch::Tensor pred = model.forward({ data }).toTuple()->elements()[0].toTensor();
 	return non_max_suppression(pred, confThres, iouThres);
