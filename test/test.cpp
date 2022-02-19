@@ -7,7 +7,7 @@
 int main()
 {
 	// 第二个参数为是否启用 cuda 详细用法可以参考 YoloV5.h 文件
-	YoloV5 yolo(torch::cuda::is_available() ? "./yolov5s.cuda.pt" : "./yolov5s.cpu.pt", torch::cuda::is_available(), true);
+	YoloV5 yolo(torch::cuda::is_available() ? "./yolov5s.cuda.pt" : "./yolov5s.cpu.pt", torch::cuda::is_available());
 	yolo.prediction(torch::rand({1, 3, 640, 640}));
 	// 读取分类标签（我们用的官方的所以这里是 coco 中的分类）
 	// 其实这些代码无所谓哪 只是后面预测出来的框没有标签罢了
