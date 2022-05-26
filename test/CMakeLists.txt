@@ -3,9 +3,9 @@ install(FILES ./coco.txt ./yolov5s.cpu.pt ./yolov5s.cuda.pt DESTINATION ${CMAKE_
 find_package(OpenCV REQUIRED)
 find_package(Torch REQUIRED)
 
-add_executable(test test.cpp)
+add_executable(verification test.cpp)
 
-target_link_libraries(test YoloV5)
-target_link_libraries(test ${OpenCV_LIBS} )
-target_link_libraries(test ${TORCH_LIBRARIES})
+target_link_libraries(verification YoloV5)
+target_link_libraries(verification ${OpenCV_LIBS} )
+target_link_libraries(verification ${TORCH_LIBRARIES})
 

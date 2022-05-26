@@ -41,7 +41,7 @@
 5. 测试
     ```
     cd bin
-    test.exe
+    verification.exe
     ```
 ### Linux 等系统中编译此项目
 由于没有测试不便多说应该是更加简单，安装好 opencv 和 libtorch 之后直接执行下面代码即可
