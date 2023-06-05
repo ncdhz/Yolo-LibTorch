@@ -71,7 +71,8 @@ public:
 	YoloV5(std::string ptFile, bool isCuda = false, bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
 	/**
 	 * 预测函数
-	 * @param data 语言预测的数据格式 (batch, rgb, height, width)
+	 * @param data 需要预测的数据格式 (batch, rgb, height, width)
+	 * @return std::vector 对应的是 batch size，torch::Tensor 的维度是 6 * n 表示（左上点x坐标，左上点y坐标，右下点x坐标，右下点y坐标，置信度，标签）n 表示有多少个框被预测出来
 	 */
 	std::vector<torch::Tensor> prediction(torch::Tensor data);
 	/**
