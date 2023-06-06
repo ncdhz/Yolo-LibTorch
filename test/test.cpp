@@ -9,10 +9,11 @@
 #define DEVICE "device"
 #define OUTPUT "output"
 #define ROI "roi"
+#define ROI_ON "on"
+#define ROI_IN "in"
 #define WIDTH "width"
 #define HEIGHT "height"
 #define PARA_NULL "null"
-#define PARA_TRUE "true"
 #define ERROR_WIDTH 30
 #define WINDOW_NAME "Yolo"
 #define OUTPUT_SUFFIX ".mp4"
@@ -34,7 +35,7 @@ void help()
 	std::cout << "-h    --help        understand the basic usage of software." << std::endl;
 	std::cout << "-d    --device      please enter the device being detected, which can be a file or a camera. The default parameter is 0, indicating camera number 0." << std::endl;
 	std::cout << "-o    --output      target detection data output file name." << std::endl;
-	std::cout << "-r    --roi         enable region of interest detection." << std::endl;
+	std::cout << "-r    --roi         enable region of interest detection. [on, in]" << std::endl;
 	std::cout << "-x    --width       video display width." << std::endl;
 	std::cout << "-y    --height      video display height." << std::endl;
 	std::cout << std::endl;
@@ -59,7 +60,7 @@ bool initParameters(std::map<std::string, std::string>& paras, int argc, char co
 			if (strcmp(argv[i], PARAMETERS[j][0]) == 0 || strcmp(argv[i], PARAMETERS[j][1]) == 0)
 			{
 				if (strcmp(PARAMETERS[j][2], ROI) == 0) {
-					paras[PARAMETERS[j][2]] = PARA_TRUE;
+					paras[PARAMETERS[j][2]] = ROI_IN;
 				}
 
 				if (i + 1 < argc)
@@ -140,7 +141,7 @@ bool roiParameters(std::vector<cv::Point>& points)
 	return true;
 }
 
-torch::Tensor getRegionData(std::vector<cv::Point> points, torch::Tensor preData)
+torch::Tensor getRegionData(std::vector<cv::Point> points, torch::Tensor preData, bool in)
 {
 
 	std::vector<int> index;
@@ -151,8 +152,16 @@ torch::Tensor getRegionData(std::vector<cv::Point> points, torch::Tensor preData
 		int sy = preData[i][1].item().toInt();
 		int ex = preData[i][2].item().toInt();
 		int ey = preData[i][3].item().toInt();
-		if (cv::pointPolygonTest(points, cv::Point(sx, sy), false) > 0 || cv::pointPolygonTest(points, cv::Point(sx, ey), false) > 0 
-			|| cv::pointPolygonTest(points, cv::Point(ex, sy), false) > 0 || cv::pointPolygonTest(points, cv::Point(ex, ey), false) > 0) 
+			// 完全在里面
+		if ((in && cv::pointPolygonTest(points, cv::Point(sx, sy), false) > 0 
+			&& cv::pointPolygonTest(points, cv::Point(sx, ey), false) > 0 
+			&& cv::pointPolygonTest(points, cv::Point(ex, sy), false) > 0 
+			&& cv::pointPolygonTest(points, cv::Point(ex, ey), false) > 0) ||
+			// 部分在里面
+			(!in && (cv::pointPolygonTest(points, cv::Point(sx, sy), false) > 0 
+			|| cv::pointPolygonTest(points, cv::Point(sx, ey), false) > 0 
+			|| cv::pointPolygonTest(points, cv::Point(ex, sy), false) > 0 
+			|| cv::pointPolygonTest(points, cv::Point(ex, ey), false) > 0))) 
 		{
 			index.push_back(i);
 		}
@@ -255,7 +264,7 @@ int main(int argc,  char const* argv[])
 			cv::polylines(frame, points, true, cv::Scalar(0, 0, 255));
 			torch::Tensor preData = r.back();
 			r.pop_back();
-			r.push_back(getRegionData(points, preData)); 
+			r.push_back(getRegionData(points, preData, !!strcmp(paras[ROI].c_str(), ROI_ON) != 0)); 
 		}
 
 		// 画框根据你自己的项目调用相应的方法，也可以不画框自己处理
