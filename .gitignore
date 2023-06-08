@@ -2,3 +2,4 @@ build
 lib
 bin
 .vscode
+yolov8n.pt

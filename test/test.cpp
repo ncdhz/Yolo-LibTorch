@@ -56,8 +56,8 @@ bool initParameters(std::map<std::string, std::string>& paras, int argc, char co
 	paras[ROI] = PARA_NULL;
 	paras[WINDOW_HEIGHT] = "640";
 	paras[WINDOW_WIDTH] = "640";
-	paras[MODLE_PATH] = torch::cuda::is_available() ? "./yolov5s.cuda.pt" : "./yolov5s.cpu.pt";
-	paras[VERSION] = "v5";
+	paras[MODLE_PATH] = "yolov8n.cpu.torchscript";
+	paras[VERSION] = "v8";
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -186,7 +186,8 @@ int main(int argc,  char const* argv[])
 	{
 		return 0;
 	}
-	for (int j = 0; j < PARAMETER_LEN; j++) {
+	for (int j = 0; j < PARAMETER_LEN; j++) 
+	{
 		std::cout << std::left << std::setw(6) << PARAMETERS[j][0] << std::left << std::setw(15) << PARAMETERS[j][1] << paras[PARAMETERS[j][2]] << std::endl;
 	}	
 	// 初始化摄像头捕捉的范围，当输入为文件时可以忽略
@@ -215,7 +216,7 @@ int main(int argc,  char const* argv[])
 	}
 
 	// 第二个参数为是否启用 cuda 详细用法可以参考 Yolo.h 文件
-	Yolo yolo(paras[MODLE_PATH], paras[VERSION], torch::cuda::is_available());
+	Yolo yolo(paras[MODLE_PATH], paras[VERSION], true);
 	yolo.prediction(torch::rand({1, 3, 640, 640}));
 	// 读取分类标签（我们用的官方的所以这里是 coco 中的分类）
 	// 其实这些代码无所谓哪 只是后面预测出来的框没有标签罢了
@@ -228,9 +229,19 @@ int main(int argc,  char const* argv[])
 		labels.insert(std::pair<int, std::string>(i, name));
 		i++;
 	}
-	// 用 OpenCV 打开摄像头读取文件（你随便咋样获取图片都OK哪）
-	cv::VideoCapture cap = cv::VideoCapture(paras[DEVICE]);
-	if (!cap.isOpened())
+	
+	// 用 OpenCV 打开摄像头或读取文件
+	cv::VideoCapture *cap;
+	if (paras[DEVICE].length() == 1 && std::isdigit(paras[DEVICE].c_str()[0]))
+	{
+		cap = new cv::VideoCapture(atoi(paras[DEVICE].c_str()));
+	}
+	else
+	{
+		cap = new cv::VideoCapture(paras[DEVICE]);
+	}
+	
+	if (!cap->isOpened())
 	{
 		errorTemplate("device error");
 		return 0;
@@ -241,17 +252,17 @@ int main(int argc,  char const* argv[])
 	// 设置宽高 无所谓多宽多高后面都会通过一个算法转换为固定宽高的
 	// 固定宽高值应该是你通过Yolo训练得到的模型所需要的
 	// 传入方式是构造 Yolo 对象时传入 width 默认值为 640，height 默认值为 640
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, windowWidth);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, windowHeight);
+	cap->set(cv::CAP_PROP_FRAME_WIDTH, windowWidth);
+	cap->set(cv::CAP_PROP_FRAME_HEIGHT, windowHeight);
 	cv::Mat frame;
 
 	// 导出打标检测视频
 	cv::VideoWriter * outputVideo = nullptr;
 
-	while (cap.isOpened())
+	while (cap->isOpened())
 	{
 		// 读取一帧
-		cap.read(frame);
+		cap->read(frame);
 		if (frame.empty())
 		{
 			std::cout << "Read frame failed!" << std::endl;
@@ -260,7 +271,7 @@ int main(int argc,  char const* argv[])
 		// 初始化输出方法
 		if (outputVideo == nullptr && strcmp(paras[OUTPUT].c_str(), PARA_NULL) != 0)
 		{
-			outputVideo = new cv::VideoWriter(paras[OUTPUT] + OUTPUT_SUFFIX, cv::VideoWriter::fourcc('M', 'P', '4', 'V'), cap.get(cv::CAP_PROP_FPS), frame.size());
+			outputVideo = new cv::VideoWriter(paras[OUTPUT] + OUTPUT_SUFFIX, cv::VideoWriter::fourcc('M', 'P', '4', 'V'), cap->get(cv::CAP_PROP_FPS), frame.size());
 		}
 		// 预测
 		// 简单吧，两行代码预测结果就出来了，封装的还可以吧 嘚瑟
@@ -295,7 +306,8 @@ int main(int argc,  char const* argv[])
 		delete outputVideo;
 	}
 
-	cap.release();
+	cap->release();
+	delete cap;
 	cv::destroyAllWindows();
 	return 0;
 }
