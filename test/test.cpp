@@ -4,26 +4,32 @@
 #include <iomanip>
 #include <map>
 #include <vector>
-#include "YoloV5.h"
+#include "Yolo.h"
 
 #define DEVICE "device"
 #define OUTPUT "output"
 #define ROI "roi"
 #define ROI_ON "on"
 #define ROI_IN "in"
-#define WIDTH "width"
-#define HEIGHT "height"
+#define WINDOW_WIDTH "window_width"
+#define WINDOW_HEIGHT "window_height"
 #define PARA_NULL "null"
 #define ERROR_WIDTH 30
 #define WINDOW_NAME "Yolo"
 #define OUTPUT_SUFFIX ".mp4"
+#define MODLE_PATH "model_path"
+#define CUDA "cuda"
+#define VERSION "version"
 
-char PARAMETERS[][3][10] = {
+char PARAMETERS[][3][20] = {
 	{"-d", "--device", DEVICE},
 	{"-o", "--output", OUTPUT},
 	{"-r", "--roi", ROI},
-	{"-x", "--width", WIDTH},
-	{"-y", "--height", HEIGHT}
+	{"-ww", "--width", WINDOW_WIDTH},
+	{"-wh", "--height", WINDOW_HEIGHT},
+	{"-m", "--modle_path", MODLE_PATH},
+	{"-c", "--cuda", CUDA},
+	{"-v", "--version", VERSION}
 };
 
 int PARAMETER_LEN = sizeof(PARAMETERS) / sizeof(PARAMETERS[0]);
@@ -36,8 +42,10 @@ void help()
 	std::cout << "-d    --device      please enter the device being detected, which can be a file or a camera. The default parameter is 0, indicating camera number 0." << std::endl;
 	std::cout << "-o    --output      target detection data output file name." << std::endl;
 	std::cout << "-r    --roi         enable region of interest detection. [on, in]" << std::endl;
-	std::cout << "-x    --width       video display width." << std::endl;
-	std::cout << "-y    --height      video display height." << std::endl;
+	std::cout << "-m    --model_path  model path." << std::endl;
+	std::cout << "-c    --cuda        whether to use cuda. [0, 1 ...]" << std::endl;
+	std::cout << "-ww   --window_width    video display width." << std::endl;
+	std::cout << "-wh   --window_height   video display height." << std::endl;
 	std::cout << std::endl;
 }
 
@@ -46,8 +54,10 @@ bool initParameters(std::map<std::string, std::string>& paras, int argc, char co
 	paras[DEVICE] = "0";
 	paras[OUTPUT] = PARA_NULL;
 	paras[ROI] = PARA_NULL;
-	paras[HEIGHT] = "640";
-	paras[WIDTH] = "640";
+	paras[WINDOW_HEIGHT] = "640";
+	paras[WINDOW_WIDTH] = "640";
+	paras[MODLE_PATH] = torch::cuda::is_available() ? "./yolov5s.cuda.pt" : "./yolov5s.cpu.pt";
+	paras[VERSION] = "v5";
 
 	for (int i = 1; i < argc; i++)
 	{
@@ -180,14 +190,14 @@ int main(int argc,  char const* argv[])
 		std::cout << std::left << std::setw(6) << PARAMETERS[j][0] << std::left << std::setw(15) << PARAMETERS[j][1] << paras[PARAMETERS[j][2]] << std::endl;
 	}	
 	// 初始化摄像头捕捉的范围，当输入为文件时可以忽略
-	int width = 0;
-	int height = 0;
-	if ((height = atoi(paras[HEIGHT].c_str())) == 0)
+	int windowWidth = 0;
+	int windowHeight = 0;
+	if ((windowHeight = atoi(paras[WINDOW_HEIGHT].c_str())) == 0)
 	{
 		errorTemplate("height error"); 
 		return 0;
 	}
-	if ((width = atoi(paras[WIDTH].c_str())) == 0)
+	if ((windowWidth = atoi(paras[WINDOW_WIDTH].c_str())) == 0)
 	{
 		errorTemplate("width error"); 
 		return 0;
@@ -204,8 +214,8 @@ int main(int argc,  char const* argv[])
 		}
 	}
 
-	// 第二个参数为是否启用 cuda 详细用法可以参考 YoloV5.h 文件
-	YoloV5 yolo(torch::cuda::is_available() ? "./yolov5s.cuda.pt" : "./yolov5s.cpu.pt", torch::cuda::is_available());
+	// 第二个参数为是否启用 cuda 详细用法可以参考 Yolo.h 文件
+	Yolo yolo(paras[MODLE_PATH], paras[VERSION], torch::cuda::is_available());
 	yolo.prediction(torch::rand({1, 3, 640, 640}));
 	// 读取分类标签（我们用的官方的所以这里是 coco 中的分类）
 	// 其实这些代码无所谓哪 只是后面预测出来的框没有标签罢了
@@ -226,13 +236,13 @@ int main(int argc,  char const* argv[])
 		return 0;
 	}
 	cv::namedWindow(WINDOW_NAME, cv::WINDOW_NORMAL | cv::WINDOW_FREERATIO);
-	cv::resizeWindow(WINDOW_NAME, width, height);
+	cv::resizeWindow(WINDOW_NAME, windowWidth, windowHeight);
 	
 	// 设置宽高 无所谓多宽多高后面都会通过一个算法转换为固定宽高的
-	// 固定宽高值应该是你通过YoloV5训练得到的模型所需要的
-	// 传入方式是构造 YoloV5 对象时传入 width 默认值为 640，height 默认值为 640
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+	// 固定宽高值应该是你通过Yolo训练得到的模型所需要的
+	// 传入方式是构造 Yolo 对象时传入 width 默认值为 640，height 默认值为 640
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, windowWidth);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, windowHeight);
 	cv::Mat frame;
 
 	// 导出打标检测视频

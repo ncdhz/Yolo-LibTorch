@@ -1,6 +1,6 @@
 ### 此项目使用可参考教程
 [VS2019 配置 LibTorch 和 OpenCV](https://zhuanlan.zhihu.com/p/375084412)
-[Windows 下 C++ 中使用 YoloV5](https://zhuanlan.zhihu.com/p/376149679)
+[Windows 下 C++ 中使用 Yolo](https://zhuanlan.zhihu.com/p/376149679)
 ### Windows 10 中编译此项目
 1. 下载所需要的编译工具
     ```
@@ -52,11 +52,11 @@
 ### 使用方法 1
 直接在工程中引入刚才生成工程下 lib 目录（库目录）和 include 目录（头文件目录），具体 `API` 见头文件或者使用方法 2 中的一些阐述
 ### 使用方法 2
-1. 添加 `YoloV5.cpp` 和 `YoloV5.h` 到你的项目
-2. 构造 `YoloV5` 对象
+1. 添加 `Yolo.cpp` 和 `Yolo.h` 到你的项目
+2. 构造 `Yolo` 对象
     ```
     // pt 文件路径
-    YoloV5 yolo("ptFile");
+    Yolo yolo("ptFile");
     ```
 3. 预测
     + 直接图片预测

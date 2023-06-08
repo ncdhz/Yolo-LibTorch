@@ -4,6 +4,9 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <ctime>
+
+#define V6 "v6"
+#define V8 "v8"
 /**
  * ImageResizeData 图片处理过后保存图片的数据结构
  */
@@ -54,21 +57,22 @@ private:
 };
 
 /**
- * YoloV5 的实现类
+ * Yolo 的实现类
  */
-class YoloV5
+class Yolo
 {
 public:
     /**
      * 构造函数
-     * @param ptFile yoloV5 pt文件路径
+     * @param ptFile Yolo pt文件路径
+	 * @param version Yolo的版本 ["v5", "v6", "v7", "v8"] 中选一
 	 * @param isCuda 是否使用 cuda 默认不起用
-	 * @param height yoloV5 训练时图片的高
-	 * @param width yoloV5 训练时图片的宽
+	 * @param height Yolo 训练时图片的高
+	 * @param width Yolo 训练时图片的宽
 	 * @param confThres 非极大值抑制中的 scoreThresh
 	 * @param iouThres 非极大值抑制中的 iouThresh
      */
-	YoloV5(std::string ptFile, bool isCuda = false, bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
+	Yolo(std::string ptFile, std::string version="v5", bool isCuda = false, bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
 	/**
 	 * 预测函数
 	 * @param data 需要预测的数据格式 (batch, rgb, height, width)
@@ -197,6 +201,8 @@ private:
 	float height;
 	// 模型所需要的图片的宽
 	float width;
+	// Yolo 版本
+	std::string version;
 	// 画框颜色 map
 	std::map<int, cv::Scalar> mainColors;
 	// 模型

@@ -4,14 +4,14 @@ cmake_minimum_required(VERSION 3.10)
 set(Torch_DIR D:/software/libtorch/share/cmake/Torch)
 set(OpenCV_DIR D:/software/opencv/build)
 
-project(YoloV5LibTorch)
+project(YoloLibTorch)
 
 include_directories(./include)
 
 add_subdirectory(./src)
 add_subdirectory(./test)
 
-install(TARGETS test YoloV5
+install(TARGETS test Yolo
     RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/bin
     ARCHIVE DESTINATION ${CMAKE_SOURCE_DIR}/lib
 )
