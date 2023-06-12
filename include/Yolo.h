@@ -66,13 +66,13 @@ public:
      * 构造函数
      * @param ptFile Yolo pt文件路径
 	 * @param version Yolo的版本 ["v5", "v6", "v7", "v8"] 中选一
-	 * @param isCuda 是否使用 cuda 默认不起用
+	 * @param device 推理使用的设备默认为cpu
 	 * @param height Yolo 训练时图片的高
 	 * @param width Yolo 训练时图片的宽
 	 * @param confThres 非极大值抑制中的 scoreThresh
 	 * @param iouThres 非极大值抑制中的 iouThresh
      */
-	Yolo(std::string ptFile, std::string version="v5", bool isCuda = false, bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
+	Yolo(std::string ptFile, std::string version="v5", std::string device = "cpu", bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
 	/**
 	 * 预测函数
 	 * @param data 需要预测的数据格式 (batch, rgb, height, width)
@@ -189,8 +189,8 @@ public:
 	bool existencePrediction(std::vector<torch::Tensor> classs);
 
 private:
-	// 是否启用 cuda
-	bool isCuda;
+	// 推理使用的设备
+	std::string device;
 	// 是否使用半精度
 	bool isHalf;
 	// 非极大值抑制中的第一步数据清理

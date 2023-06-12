@@ -1,19 +1,16 @@
 #include "Yolo.h"
 
-Yolo::Yolo(std::string ptFile, std::string version, bool isCuda, bool isHalf, int height, int width, float confThres, float iouThres)
+Yolo::Yolo(std::string ptFile, std::string version, std::string device, bool isHalf, int height, int width, float confThres, float iouThres)
 {
 	model = torch::jit::load(ptFile);
-	if (isCuda) 
-	{
-		model.to(torch::kCUDA);
-	}
-	if (isHalf) 
+	if (isHalf)
 	{
 		model.to(torch::kHalf);
 	}
+	model.to(device);
+	this->device=device;
 	this->height = height;
 	this->width = width;
-	this->isCuda = isCuda;
 	this->iouThres = iouThres;
 	this->confThres = confThres;
 	this->isHalf = isHalf;
@@ -191,18 +188,11 @@ std::vector<torch::Tensor> Yolo::sizeOriginal(std::vector<torch::Tensor> result,
 
 std::vector<torch::Tensor> Yolo::prediction(torch::Tensor data)
 {
-	if (!data.is_cuda() && this->isCuda) 
-	{
-		data = data.cuda();
-	}
-	if (data.is_cuda() && !this->isCuda) 
-	{
-		data = data.cpu();
-	}
 	if (this->isHalf)
 	{
 		data = data.to(torch::kHalf);
 	}
+	data = data.to(this->device);
 
 	auto pred = model.forward({ data });
 	

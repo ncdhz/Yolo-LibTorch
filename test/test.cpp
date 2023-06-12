@@ -106,8 +106,13 @@ int main(int argc,  char const* argv[])
 	}
 
 	// 第三个参数为是否启用 cuda 详细用法可以参考 Yolo.h 文件
-	Yolo yolo(para[MODEL_PATH].getS(), para[VERSION].getS(), para[CUDA].getB());
+	Yolo yolo(para[MODEL_PATH].getS(), para[VERSION].getS(), 
+		para[DEVICE].getS(), para[IS_HALF].getB(), para[MODEL_HEIGHT].getI(), para[MODEL_WIDTH].getI());
+	
+	std::cout << "model loaded successfully." << std::endl;
+
 	yolo.prediction(torch::rand({1, 3, para[MODEL_WIDTH].getI(), para[MODEL_HEIGHT].getI()}));
+
 	// 读取分类标签（我们用的官方的所以这里是 coco 中的分类）
 	// 其实这些代码无所谓哪 只是后面预测出来的框没有标签罢了
 	std::ifstream f("./coco.txt");
@@ -123,18 +128,18 @@ int main(int argc,  char const* argv[])
 	
 	// 用 OpenCV 打开摄像头或读取文件
 	cv::VideoCapture *cap;
-	if (para[DEVICE].t == INT)
+	if (para[INPUT].t == INT)
 	{
-		cap = new cv::VideoCapture(para[DEVICE].getI());
+		cap = new cv::VideoCapture(para[INPUT].getI());
 	}
 	else
 	{
-		cap = new cv::VideoCapture(para[DEVICE].getS());
+		cap = new cv::VideoCapture(para[INPUT].getS());
 	}
 	
 	if (!cap->isOpened())
 	{
-		errorTemplate("device error");
+		errorTemplate("input error");
 		return 0;
 	}
 	cv::namedWindow(WINDOW_NAME, cv::WINDOW_NORMAL | cv::WINDOW_FREERATIO);
@@ -162,7 +167,12 @@ int main(int argc,  char const* argv[])
 		// 初始化输出方法
 		if (outputVideo == nullptr && para[OUTPUT].t == STRING)
 		{
-			outputVideo = new cv::VideoWriter(para[OUTPUT].getS() + OUTPUT_SUFFIX, cv::VideoWriter::fourcc('M', 'P', '4', 'V'), cap->get(cv::CAP_PROP_FPS), frame.size());
+			int fps = cap->get(cv::CAP_PROP_FPS);
+			if (!fps)
+			{
+				fps = 24;
+			}
+			outputVideo = new cv::VideoWriter(para[OUTPUT].getS() + OUTPUT_SUFFIX, cv::VideoWriter::fourcc('M', 'P', '4', 'V'), fps, frame.size());
 		}
 		// 预测
 		// 简单吧，两行代码预测结果就出来了，封装的还可以吧 嘚瑟

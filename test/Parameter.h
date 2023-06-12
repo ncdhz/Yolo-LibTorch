@@ -16,9 +16,10 @@
 #define WINDOW_NAME "Yolo"
 #define OUTPUT_SUFFIX ".mp4"
 #define MODEL_PATH "model_path"
-#define CUDA "cuda"
+#define INPUT "input"
 #define VERSION "version"
 #define HELP "help"
+#define IS_HALF "is_half"
 #define STRING 1
 #define INT 2
 #define BOOL 4

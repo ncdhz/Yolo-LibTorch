@@ -3,12 +3,14 @@
 Parameter::Parameter()
 {
 	this->datas.insert(std::make_pair(HELP, Desc("--help", "-h", false, BOOL, BOOL, "understand the basic usage of software.")));
-	this->datas.insert(std::make_pair(DEVICE, Desc("--device", "-d", 0, INT | STRING, INT, "please enter the device being detected, which can be a file or a camera. The default parameter is 0.")));
+	this->datas.insert(std::make_pair(INPUT, Desc("--input", "-i", 0, INT | STRING, INT, 
+		"please enter the device being detected, which can be a file or a camera. default 0.")));
 	this->datas.insert(std::make_pair(OUTPUT, Desc("--output", "-o", false, BOOL | STRING, BOOL, "target detection data output file name.")));
 	this->datas.insert(std::make_pair(ROI, Desc("--roi", "-r", false, STRING | BOOL, BOOL, "enable region of interest detection. [on, in]")));
-	this->datas.insert(std::make_pair(CUDA, Desc("--cuda", "-c", false, BOOL, BOOL, "whether to use cuda. [0, 1 ...]")));
+	this->datas.insert(std::make_pair(DEVICE, Desc("--device", "-d", std::string("cpu"), STRING, STRING, "cuda device, i.e. cuda:0 or cuda:1,cuda:2 or cpu")));
 	this->datas.insert(std::make_pair(VERSION, Desc("--version", "-v", std::string("v8"), STRING, STRING, "using the version of the model. [v5, v6, v7, v8]")));
 
+	this->datas.insert(std::make_pair(IS_HALF, Desc("--is_half", "-ih", false, BOOL, BOOL, "open half precision.")));
 	this->datas.insert(std::make_pair(WINDOW_HEIGHT, Desc("--window_height", "-wh", 640, INT, INT, "window display height.")));
 	this->datas.insert(std::make_pair(WINDOW_WIDTH, Desc("--window_width", "-ww", 640, INT, INT, "window display width.")));
 	this->datas.insert(std::make_pair(MODEL_PATH, Desc("--model_path", "-mp", std::string("yolov8n.cpu.torchscript"), STRING, STRING, "model path.")));
