@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.10)
 # Windows 系统下指定 pytorch 路径和 opencv 路径
 # set(Torch_DIR /path/to/libtorch/share/cmake/Torch)
 # set(OpenCV_DIR /path/to/opencv/build)
-set(Torch_DIR C:/Users/11374/Documents/program/libtorch/share/cmake/Torch)
-set(OpenCV_DIR C:/Users/11374/Documents/program/opencv/build)
 
 project(YoloLibTorch)
 

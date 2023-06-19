@@ -13,13 +13,14 @@
 #define MODEL_WIDTH "model_width"
 #define MODEL_HEIGHT "model_height"
 #define ERROR_WIDTH 40
-#define WINDOW_NAME "Yolo"
-#define OUTPUT_SUFFIX ".mp4"
 #define MODEL_PATH "model_path"
 #define INPUT "input"
 #define VERSION "version"
 #define HELP "help"
 #define IS_HALF "is_half"
+#define IS_CLOSE "is_close"
+#define IS_IMAGE "is_image"
+#define LABEL_PATH "label_path"
 #define STRING 1
 #define INT 2
 #define BOOL 4

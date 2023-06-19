@@ -10,7 +10,10 @@ Parameter::Parameter()
 	this->datas.insert(std::make_pair(DEVICE, Desc("--device", "-d", std::string("cpu"), STRING, STRING, "cuda device, i.e. cuda:0 or cuda:1,cuda:2 or cpu")));
 	this->datas.insert(std::make_pair(VERSION, Desc("--version", "-v", std::string("v8"), STRING, STRING, "using the version of the model. [v5, v6, v7, v8]")));
 
+	this->datas.insert(std::make_pair(LABEL_PATH, Desc("--label_path", "-lp", std::string("coco.txt"), STRING, STRING, "label path.")));
 	this->datas.insert(std::make_pair(IS_HALF, Desc("--is_half", "-ih", false, BOOL, BOOL, "open half precision.")));
+	this->datas.insert(std::make_pair(IS_CLOSE, Desc("--is_close", "-ic", false, BOOL, BOOL, "image display.")));
+	this->datas.insert(std::make_pair(IS_IMAGE, Desc("--is_image", "-ii", false, BOOL, BOOL, "an image.")));
 	this->datas.insert(std::make_pair(WINDOW_HEIGHT, Desc("--window_height", "-wh", 640, INT, INT, "window display height.")));
 	this->datas.insert(std::make_pair(WINDOW_WIDTH, Desc("--window_width", "-ww", 640, INT, INT, "window display width.")));
 	this->datas.insert(std::make_pair(MODEL_PATH, Desc("--model_path", "-mp", std::string("yolov8n.cpu.torchscript"), STRING, STRING, "model path.")));
