@@ -1,8 +1,8 @@
 
 ## 文档
-<a href="https://ncdhz.github.io/Yolo-LibTorch">Yolo-LibTorch</a>旨在使用<a href="https://pytorch.org/">LibTorch</a>轻松调用Yolo的各种版本<a href="https://github.com/ultralytics/yolov5">YoloV5</a>、<a href="https://github.com/meituan/YOLOv6">YoloV6</a>、<a href="https://github.com/WongKinYiu/yolov7">YoloV7</a>和<a href="https://github.com/ultralytics/ultralytics">YoloV8</a>等。（以下结果通过yolov8n模型预测）
+<a href="https://ncdhz.github.io/Yolo-LibTorch">Yolo-LibTorch</a>旨在使用<a href="https://pytorch.org/">LibTorch</a>轻松调用`Yolo`的各种版本<a href="https://github.com/ultralytics/yolov5">YoloV5</a>、<a href="https://github.com/meituan/YOLOv6">YoloV6</a>、<a href="https://github.com/WongKinYiu/yolov7">YoloV7</a>和<a href="https://github.com/ultralytics/ultralytics">YoloV8</a>等（以下结果通过`yolov8n`模型预测）。**此项目需要`torchscript`的模型格式**。
 <br/>
-<img src="./images/test.jpg"/>
+<img src="./images/test.jpg" class="img"/>
 
 ## 快速开始
 
