@@ -72,7 +72,7 @@ public:
 	 * @param confThres 非极大值抑制中的 scoreThresh
 	 * @param iouThres 非极大值抑制中的 iouThresh
      */
-	Yolo(std::string ptFile, std::string version="v5", std::string device = "cpu", bool isHalf = false, int height = 640, int width = 640,  float confThres = 0.25, float iouThres = 0.45);
+	Yolo(std::string ptFile, std::string version="v8", std::string device="cpu", bool isHalf=false, int height=640, int width=640,  float confThres=0.25, float iouThres=0.45);
 	/**
 	 * 预测函数
 	 * @param data 需要预测的数据格式 (batch, rgb, height, width)
@@ -93,7 +93,7 @@ public:
 	 * 预测函数 
 	 * @param imgs 需要预测的图片集合
 	 */
-	std::vector<torch::Tensor> prediction(std::vector <cv::Mat> imgs);
+	std::vector<torch::Tensor> prediction(std::vector<cv::Mat> imgs);
 	/**
 	 * 改变图片大小的函数
 	 * @param img 原始图片
@@ -115,13 +115,13 @@ public:
 	 * @param width 要处理成的图片的宽
 	 * @return 封装好的处理过后图片数据结构
 	 */
-	static std::vector<ImageResizeData> resize(std::vector <cv::Mat> imgs, int height, int width);
+	static std::vector<ImageResizeData> resize(std::vector<cv::Mat> imgs, int height, int width);
 	/**
 	 * 改变图片大小的函数
 	 * @param imgs 原始图片集合
 	 * @return 封装好的处理过后图片数据结构
 	 */
-	std::vector<ImageResizeData> resize(std::vector <cv::Mat> imgs);
+	std::vector<ImageResizeData> resize(std::vector<cv::Mat> imgs);
 	/**
 	 * 根据输出结果在给定图片中画出框
 	 * @param imgs 原始图片集合
@@ -155,7 +155,7 @@ public:
 	 * @param thickness 线宽
 	 * @return 画好框的图片
 	 */
-	cv::Mat	drawRectangle(cv::Mat img, torch::Tensor rectangle, int thickness = 2);
+	cv::Mat drawRectangle(cv::Mat img, torch::Tensor rectangle, int thickness = 2);
 	/**
 	 * 根据输出结果在给定图片中画出框
 	 * @param img 原始图片
@@ -164,7 +164,7 @@ public:
 	 * @param thickness 线宽
 	 * @return 画好框的图片
 	 */
-	cv::Mat	drawRectangle(cv::Mat img, torch::Tensor rectangle, std::map<int, std::string> labels, int thickness = 2);
+	cv::Mat drawRectangle(cv::Mat img, torch::Tensor rectangle, std::map<int, std::string> labels, int thickness = 2);
 	/**
 	 * 根据输出结果在给定图片中画出框
 	 * @param img 原始图片
@@ -174,7 +174,7 @@ public:
 	 * @param thickness 线宽
 	 * @return 画好框的图片
 	 */
-	cv::Mat	drawRectangle(cv::Mat img, torch::Tensor rectangle, std::map<int, cv::Scalar> colors, std::map<int, std::string> labels, int thickness = 2);
+	cv::Mat drawRectangle(cv::Mat img, torch::Tensor rectangle, std::map<int, cv::Scalar> colors, std::map<int, std::string> labels, int thickness = 2);
 	/**
 	 * 用于判断给定数据是否存在预测
 	 * @param clazz 通过预测函数处理好的结果
