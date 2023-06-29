@@ -62,6 +62,8 @@ Yolo(std::string ptFile, std::string version="v8", std::string device="cpu", boo
 
 ### 图片尺寸
 
+> 按照等比例放缩图片，不足部分补充黑边。黑边在图片两侧（上下或左右），图片处于居中位置。
+
 1. 方法一
 
     ```cpp
@@ -191,3 +193,107 @@ Yolo(std::string ptFile, std::string version="v8", std::string device="cpu", boo
         * `key` 标签编号从0开始
         * `value` 编号对应的值
     * `thickness` 线的粗细
+
+#### 返回值
+
+* `cv::Mat` 绘制好的图片
+* `std::vector<cv::Mat>` 绘制好的图片集合
+
+### 存在预测
+
+1. 方法一
+
+    ```cpp
+    bool existencePrediction(torch::Tensor clazz)
+    ```
+
+    * `clazz` 某一张图片的预测结果
+
+    > 判断此张图片中是否存在预测。
+
+2. 方法二
+
+    ```cpp
+    bool existencePrediction(std::vector<torch::Tensor> classs)
+    ```
+
+    * `classs` 多张图片的预测结果
+
+    > 判断图片集合中是否存在预测（只要有一张图存在返回`true`）。
+
+## ImageResizeData
+
+> 此类不建议手动操作，为`Yolo`类中`resize`方法的返回值，能获取到返回图片的基本信息。
+
+### 图片
+
+1. 设置图片
+
+    ```cpp
+    void setImg(cv::Mat img)
+    ```
+
+    * `img` 图片
+
+2. 获取图片
+
+    ```cpp
+    cv::Mat getImg()
+    ```
+
+### 图片宽高
+
+1. 原始图片的宽高
+
+    ```cpp
+    // 设置原始图片的宽
+    void setW(int w)
+    // 获取原始图片的宽
+    int getW()
+    // 设置原始图片的高
+    void setH(int h)
+    // 获取原始图片的高
+    int getH()
+    ```
+
+2. 处理图片的宽高
+
+    ```cpp
+    // 设置处理图片的宽
+    void setWidth(int width)
+    // 获取处理图片的宽
+    int getWidth()
+    // 设置处理图片的高
+    void setHeight(int h)
+    // 获取处理图片的高
+    int getHeight()
+    ```
+
+### 图片黑边
+
+1. 设置或获取图片黑边
+
+    ```cpp
+    // 设置图片的黑边
+    void setBorder(int border)
+    // 获取图片的黑边
+    int getBorder()
+    ```
+
+### 宽高判断
+
+1. 宽
+
+    ```cpp
+    bool isW()
+    ```
+
+    > 当原始图片**宽高**比大于处理过后图片宽高比时此函数返回 `true`。
+
+2. 高
+
+    ```cpp
+    bool isH()
+    ```
+
+    > 当原始图片**高宽**比大于处理过后图片高宽比时此函数返回 `true`。

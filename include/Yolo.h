@@ -13,7 +13,7 @@
 class ImageResizeData
 {
 public:
-    // 添加处理过后的图片
+    // 设置处理过后的图片
 	void setImg(cv::Mat img);
     // 获取处理过后的图片
 	cv::Mat getImg();
@@ -21,23 +21,23 @@ public:
 	bool isW();
     // 当原始图片高宽比大于处理过后图片高宽比时此函数返回 true
 	bool isH();
-    // 添加处理之后图片的宽
+    // 设置处理之后图片的宽
 	void setWidth(int width);
     // 获取处理之后图片的宽
 	int getWidth();
-    // 添加处理之后图片的高
+    // 设置处理之后图片的高
 	void setHeight(int height);
     // 获取处理之后图片的高
 	int getHeight();
-    // 添加原始图片的宽
+    // 设置原始图片的宽
 	void setW(int w);
     // 获取原始图片的宽
 	int getW();
-    // 添加原始图片的高
+    // 设置原始图片的高
 	void setH(int h);
     // 获取原始图片的高
 	int getH();
-    // 添加从原始图片到处理过后图片所添加黑边大小
+    // 设置从原始图片到处理过后图片所添加黑边大小
 	void setBorder(int border);
     // 获取从原始图片到处理过后图片所添加黑边大小
 	int getBorder();
