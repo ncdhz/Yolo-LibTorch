@@ -199,8 +199,8 @@ std::vector<torch::Tensor> Yolo::prediction(torch::Tensor data)
 	if (strcmp(this->version.c_str(), V8) == 0)
 	{
 		torch::Tensor pT = pred.toTensor();
-		torch::Tensor score = std::get<0>(pT.slice(1, 4, -1).max(1, true));
-		data = torch::cat({pT.slice(1, 0, 4), score, pT.slice(1, 4, -1)}, 1).permute({0, 2, 1});
+		torch::Tensor score = std::get<0>(pT.slice(1, 4, pT.size(1)).max(1, true));
+		data = torch::cat({pT.slice(1, 0, 4), score, pT.slice(1, 4, pT.size(1))}, 1).permute({0, 2, 1});
 	}
 	else if (strcmp(this->version.c_str(), V6) == 0)
 	{
