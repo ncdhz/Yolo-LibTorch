@@ -76,7 +76,7 @@ public:
 	/**
 	 * 预测函数
 	 * @param data 需要预测的数据格式 (batch, rgb, height, width)
-	 * @return std::vector 对应的是 batch size，torch::Tensor 的维度是 6 * n 表示（左上点x坐标，左上点y坐标，右下点x坐标，右下点y坐标，置信度，标签）n 表示有多少个框被预测出来
+	 * @return std::vector 对应的是 batch size，torch::Tensor 的维度是 n * 6 表示（左上点x坐标，左上点y坐标，右下点x坐标，右下点y坐标，置信度，标签）n 表示有多少个框被预测出来
 	 */
 	std::vector<torch::Tensor> prediction(torch::Tensor data);
 	/**
