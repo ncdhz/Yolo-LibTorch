@@ -13,47 +13,47 @@
 class ImageResizeData
 {
 public:
-    // 设置处理过后的图片
+	// 设置处理过后的图片
 	void setImg(cv::Mat img);
-    // 获取处理过后的图片
+	// 获取处理过后的图片
 	cv::Mat getImg();
-    // 当原始图片宽高比大于处理过后图片宽高比时此函数返回 true
-	bool isW();
-    // 当原始图片高宽比大于处理过后图片高宽比时此函数返回 true
-	bool isH();
-    // 设置处理之后图片的宽
+	// 当原始图片宽高比大于处理过后图片宽高比时此函数返回 true
+	bool isW() const;
+	// 当原始图片高宽比大于处理过后图片高宽比时此函数返回 true
+	bool isH() const;
+	// 设置处理之后图片的宽
 	void setWidth(int width);
-    // 获取处理之后图片的宽
+	// 获取处理之后图片的宽
 	int getWidth();
-    // 设置处理之后图片的高
+	// 设置处理之后图片的高
 	void setHeight(int height);
-    // 获取处理之后图片的高
-	int getHeight();
-    // 设置原始图片的宽
+	// 获取处理之后图片的高
+	int getHeight() const;
+	// 设置原始图片的宽
 	void setW(int w);
-    // 获取原始图片的宽
-	int getW();
-    // 设置原始图片的高
+	// 获取原始图片的宽
+	int getW() const;
+	// 设置原始图片的高
 	void setH(int h);
-    // 获取原始图片的高
-	int getH();
-    // 设置从原始图片到处理过后图片所添加黑边大小
+	// 获取原始图片的高
+	int getH() const;
+	// 设置从原始图片到处理过后图片所添加黑边大小
 	void setBorder(int border);
-    // 获取从原始图片到处理过后图片所添加黑边大小
-	int getBorder();
+	// 获取从原始图片到处理过后图片所添加黑边大小
+	int getBorder() const;
 private:
-    // 处理过后图片高
+	// 处理过后图片高
 	int height;
 	// 处理过后图片宽
-    int width;
+	int width;
 	// 原始图片宽
-    int w;
+	int w;
 	// 原始图片高
-    int h;
+	int h;
 	// 从原始图片到处理图片所添加的黑边大小
-    int border;
+	int border;
 	// 处理过后的图片
-    cv::Mat img;
+	cv::Mat img;
 };
 
 /**
@@ -62,17 +62,17 @@ private:
 class Yolo
 {
 public:
-    /**
-     * 构造函数
-     * @param ptFile Yolo pt文件路径
+	/**
+	 * 构造函数
+	 * @param ptFile Yolo pt文件路径
 	 * @param version Yolo的版本 ["v5", "v6", "v7", "v8"] 中选一
 	 * @param device 推理使用的设备默认为cpu
 	 * @param height Yolo 训练时图片的高
 	 * @param width Yolo 训练时图片的宽
 	 * @param confThres 非极大值抑制中的 scoreThresh
 	 * @param iouThres 非极大值抑制中的 iouThresh
-     */
-	Yolo(std::string ptFile, std::string version="v8", std::string device="cpu", bool isHalf=false, int height=640, int width=640,  float confThres=0.25, float iouThres=0.45);
+	 */
+	Yolo(std::string ptFile, std::string version = "v8", std::string device = "cpu", bool isHalf = false, int height = 640, int width = 640, float confThres = 0.25, float iouThres = 0.45);
 	/**
 	 * 预测函数
 	 * @param data 需要预测的数据格式 (batch, rgb, height, width)
@@ -90,7 +90,7 @@ public:
 	 */
 	std::vector<torch::Tensor> prediction(cv::Mat img);
 	/**
-	 * 预测函数 
+	 * 预测函数
 	 * @param imgs 需要预测的图片集合
 	 */
 	std::vector<torch::Tensor> prediction(std::vector<cv::Mat> imgs);
@@ -144,7 +144,7 @@ public:
 	 * @param imgs 原始图片集合
 	 * @param rectangles 通过预测函数处理好的结果
 	 * @param colors 每种类型对应颜色
-	 * @param labels 类别标签 
+	 * @param labels 类别标签
 	 * @return 画好框的图片
 	 */
 	std::vector<cv::Mat> drawRectangle(std::vector<cv::Mat> imgs, std::vector<torch::Tensor> rectangles, std::map<int, cv::Scalar> colors, std::map<int, std::string> labels, int thickness = 2);
@@ -210,7 +210,7 @@ private:
 	// 随机获取一种颜色
 	cv::Scalar getRandScalar();
 	// 图片通道转换为 rgb
-	cv::Mat img2RGB(cv::Mat img);
+	void img2RGB(cv::Mat& img, cv::Mat& dst);
 	// 图片变为 Tensor
 	torch::Tensor img2Tensor(cv::Mat img);
 	// (center_x center_y w h) to (left, top, right, bottom)
@@ -220,5 +220,5 @@ private:
 	// 预测出来的框根据原始图片还原算法
 	std::vector<torch::Tensor> sizeOriginal(std::vector<torch::Tensor> result, std::vector<ImageResizeData> imgRDs);
 	// 非极大值抑制算法整体
-	std::vector<torch::Tensor> non_max_suppression(torch::Tensor preds, float confThres = 0.25, float iouThres = 0.45);
+	std::vector<torch::Tensor> nonMaxSuppression(torch::Tensor preds, float confThres = 0.25, float iouThres = 0.45);
 };

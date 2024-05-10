@@ -8,7 +8,7 @@ Yolo::Yolo(std::string ptFile, std::string version, std::string device, bool isH
 		model.to(torch::kHalf);
 	}
 	model.to(device);
-	this->device=device;
+	this->device = device;
 	this->height = height;
 	this->width = width;
 	this->iouThres = iouThres;
@@ -20,11 +20,9 @@ Yolo::Yolo(std::string ptFile, std::string version, std::string device, bool isH
 	std::srand(seed);
 }
 
-std::vector<torch::Tensor> Yolo::non_max_suppression(torch::Tensor prediction, float confThres, float iouThres)
+std::vector<torch::Tensor> Yolo::nonMaxSuppression(torch::Tensor prediction, float confThres, float iouThres)
 {
 	torch::Tensor xc = prediction.select(2, 4) > confThres;
-	int maxWh = 4096;
-	int maxNms = 30000;
 	std::vector<torch::Tensor> output;
 	for (int i = 0; i < prediction.size(0); i++)
 	{
@@ -35,8 +33,7 @@ std::vector<torch::Tensor> Yolo::non_max_suppression(torch::Tensor prediction, f
 		torch::Tensor x = prediction[i];
 		x = x.index_select(0, torch::nonzero(xc[i]).select(1, 0));
 		if (x.size(0) == 0) continue;
-		
-		x.slice(1, 5, x.size(1)).mul_(x.slice(1, 4, 5));
+
 		torch::Tensor box = xywh2xyxy(x.slice(1, 0, 4));
 		std::tuple<torch::Tensor, torch::Tensor> max_tuple = torch::max(x.slice(1, 5, x.size(1)), 1, true);
 		x = torch::cat({ box, std::get<0>(max_tuple), std::get<1>(max_tuple) }, 1);
@@ -46,11 +43,7 @@ std::vector<torch::Tensor> Yolo::non_max_suppression(torch::Tensor prediction, f
 		{
 			continue;
 		}
-		else if (n > maxNms)
-		{
-			x = x.index_select(0, x.select(1, 4).argsort(0, true).slice(0, 0, maxNms));
-		}
-		torch::Tensor c = x.slice(1, 5, 6) * maxWh;
+		torch::Tensor c = x.slice(1, 5, 6) * 4096;
 		torch::Tensor boxes = x.slice(1, 0, 4) + c, scores = x.select(1, 4);
 		torch::Tensor ix = nms(boxes, scores, iouThres).to(x.device());
 		output[i] = x.index_select(0, ix).cpu();
@@ -63,7 +56,7 @@ cv::Scalar Yolo::getRandScalar()
 	return cv::Scalar(std::rand() % 256, std::rand() % 256, std::rand() % 256);
 }
 
-cv::Mat Yolo::img2RGB(cv::Mat img)
+void Yolo::img2RGB(cv::Mat &img, cv::Mat& dst)
 {
 	int imgC = img.channels();
 	if (imgC == 1)
@@ -74,12 +67,11 @@ cv::Mat Yolo::img2RGB(cv::Mat img)
 	{
 		cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
 	}
-	return img;
 }
 
 torch::Tensor Yolo::img2Tensor(cv::Mat img)
 {
-	torch::Tensor data = torch::from_blob(img.data, {(int)height, (int)width, 3 }, torch::kByte);
+	torch::Tensor data = torch::from_blob(img.data, { (int)height, (int)width, 3 }, torch::kByte);
 	data = data.permute({ 2, 0, 1 });
 	data = data.toType(torch::kFloat);
 	data = data.div(255);
@@ -108,15 +100,15 @@ torch::Tensor Yolo::nms(torch::Tensor bboxes, torch::Tensor scores, float thresh
 	auto order = std::get<1>(tuple_sorted);
 
 	std::vector<int> keep;
-	while (order.numel() > 0) 
+	while (order.numel() > 0)
 	{
-		if (order.numel() == 1) 
+		if (order.numel() == 1)
 		{
 			auto i = order.item();
 			keep.push_back(i.toInt());
 			break;
 		}
-		else 
+		else
 		{
 			auto i = order[0].item();
 			keep.push_back(i.toInt());
@@ -132,7 +124,7 @@ torch::Tensor Yolo::nms(torch::Tensor bboxes, torch::Tensor scores, float thresh
 
 		auto iou = inter / (areas[keep.back()] + areas.index({ order.narrow(0,1,order.size(-1) - 1) }) - inter);
 		auto idx = (iou <= thresh).nonzero().squeeze();
-		if (idx.numel() == 0) 
+		if (idx.numel() == 0)
 		{
 			break;
 		}
@@ -180,7 +172,7 @@ std::vector<torch::Tensor> Yolo::sizeOriginal(std::vector<torch::Tensor> result,
 				}
 			}
 		}
-		
+
 		resultOrg.push_back(data);
 	}
 	return resultOrg;
@@ -195,12 +187,12 @@ std::vector<torch::Tensor> Yolo::prediction(torch::Tensor data)
 	data = data.to(this->device);
 
 	auto pred = model.forward({ data });
-	
+
 	if (strcmp(this->version.c_str(), V8) == 0)
 	{
 		torch::Tensor pT = pred.toTensor();
 		torch::Tensor score = std::get<0>(pT.slice(1, 4, pT.size(1)).max(1, true));
-		data = torch::cat({pT.slice(1, 0, 4), score, pT.slice(1, 4, pT.size(1))}, 1).permute({0, 2, 1});
+		data = torch::cat({ pT.slice(1, 0, 4), score, pT.slice(1, 4, pT.size(1)) }, 1).permute({ 0, 2, 1 });
 	}
 	else if (strcmp(this->version.c_str(), V6) == 0)
 	{
@@ -211,7 +203,7 @@ std::vector<torch::Tensor> Yolo::prediction(torch::Tensor data)
 		data = pred.toTuple()->elements()[0].toTensor();
 	}
 
-	return non_max_suppression(data, confThres, iouThres);
+	return nonMaxSuppression(data, confThres, iouThres);
 }
 
 std::vector<torch::Tensor> Yolo::prediction(std::string filePath)
@@ -223,7 +215,8 @@ std::vector<torch::Tensor> Yolo::prediction(std::string filePath)
 std::vector<torch::Tensor> Yolo::prediction(cv::Mat img)
 {
 	ImageResizeData imgRD = resize(img);
-	cv::Mat reImg = img2RGB(imgRD.getImg());
+	cv::Mat reImg = imgRD.getImg();
+	img2RGB(reImg, reImg);
 	torch::Tensor data = img2Tensor(reImg);
 	std::vector<torch::Tensor> result = prediction(data);
 	std::vector<ImageResizeData> imgRDs;
@@ -239,7 +232,8 @@ std::vector<torch::Tensor> Yolo::prediction(std::vector<cv::Mat> imgs)
 	{
 		ImageResizeData imgRD = resize(imgs[i]);
 		imageRDs.push_back(imgRD);
-		cv::Mat img = img2RGB(imgRD.getImg());
+		cv::Mat img = imgRD.getImg();
+		img2RGB(img, img);
 		datas.push_back(img2Tensor(img));
 	}
 	torch::Tensor data = torch::cat(datas, 0);
@@ -259,18 +253,19 @@ ImageResizeData Yolo::resize(cv::Mat img, int height, int width)
 
 	cv::resize(img, img, cv::Size(
 		isW ? width : (int)((float)height / (float)h * w),
-		isW ? (int)((float)width / (float)w * h) : height));
+		isW ? (int)((float)width / (float)w * h) : height),
+		0, 0, cv::INTER_AREA);
 
 	w = img.cols, h = img.rows;
 	if (isW)
 	{
 		imgResizeData.setBorder((height - h) / 2);
-		cv::copyMakeBorder(img, img, (height - h) / 2, height - h - (height - h) / 2, 0, 0, cv::BORDER_CONSTANT);
+		cv::copyMakeBorder(img, img, (height - h) / 2, height - h - (height - h) / 2, 0, 0, cv::BORDER_CONSTANT, cv::Scalar(114.));
 	}
 	else
 	{
 		imgResizeData.setBorder((width - w) / 2);
-		cv::copyMakeBorder(img, img, 0, 0, (width - w) / 2, width - w - (width - w) / 2, cv::BORDER_CONSTANT);
+		cv::copyMakeBorder(img, img, 0, 0, (width - w) / 2, width - w - (width - w) / 2, cv::BORDER_CONSTANT, cv::Scalar(114.));
 	}
 	imgResizeData.setImg(img);
 	return imgResizeData;
@@ -362,7 +357,7 @@ cv::Mat Yolo::drawRectangle(cv::Mat img, torch::Tensor rectangle, std::map<int, 
 		labelIt = labels.find(clazz);
 
 		std::ostringstream oss;
-		
+
 		if (labelIt != labels.end())
 		{
 			oss << labelIt->second << " ";
@@ -385,7 +380,7 @@ bool Yolo::existencePrediction(std::vector<torch::Tensor> classs)
 {
 	for (int i = 0; i < classs.size(); i++)
 	{
-		if (existencePrediction(classs[i])) 
+		if (existencePrediction(classs[i]))
 		{
 			return true;
 		}
@@ -404,12 +399,12 @@ cv::Mat ImageResizeData::getImg()
 	return img;
 }
 
-bool ImageResizeData::isW()
+bool ImageResizeData::isW() const
 {
 	return (float)w / (float)h > (float)width / (float)height;
 }
 
-bool ImageResizeData::isH()
+bool ImageResizeData::isH() const
 {
 	return (float)h / (float)w > (float)height / (float)width;
 }
@@ -429,7 +424,7 @@ void ImageResizeData::setHeight(int height)
 	this->height = height;
 }
 
-int ImageResizeData::getHeight()
+int ImageResizeData::getHeight() const
 {
 	return height;
 }
@@ -439,7 +434,7 @@ void ImageResizeData::setW(int w)
 	this->w = w;
 }
 
-int ImageResizeData::getW()
+int ImageResizeData::getW() const
 {
 	return w;
 }
@@ -449,7 +444,7 @@ void ImageResizeData::setH(int h)
 	this->h = h;
 }
 
-int ImageResizeData::getH()
+int ImageResizeData::getH() const
 {
 	return h;
 }
@@ -459,7 +454,7 @@ void ImageResizeData::setBorder(int border)
 	this->border = border;
 }
 
-int ImageResizeData::getBorder()
+int ImageResizeData::getBorder() const
 {
 	return border;
 }
